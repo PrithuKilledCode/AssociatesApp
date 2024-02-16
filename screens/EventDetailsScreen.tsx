@@ -14,12 +14,12 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import {themeStyle} from '../themes/themeStyles';
 type Props = {};
 
-const TaskDetailsScreen = (props: Props) => {
+const EventDetailsScreen = (props: Props) => {
   const navigation = useNavigation();
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background}}>
       <HeaderComponent
-        Heading="Task Details"
+        Heading="Event Details"
         left={
           <Pressable onPress={() => navigation.goBack()}>
             <Icon name="arrowleft" size={28} />
@@ -33,7 +33,16 @@ const TaskDetailsScreen = (props: Props) => {
           text="Lorem ipsum consectetur."
           textAlign="left"
         />
-
+        <View style={styles.cont}>
+          <Icon name="clockcircleo" size={16} color={theme.colors.text}></Icon>
+          <Text
+            style={[themeStyle.poppinsTextBold, {color: theme.colors.text}]}>
+            11:00 AM
+          </Text>
+        </View>
+        <Text style={[themeStyle.textSmall, {marginLeft: 50}]}>
+          14 Jun, 2023
+        </Text>
         <View style={styles.cont}>
           <Icon name="profile" size={16} color={theme.colors.text}></Icon>
           <Text
@@ -59,7 +68,7 @@ const TaskDetailsScreen = (props: Props) => {
   );
 };
 
-export default TaskDetailsScreen;
+export default EventDetailsScreen;
 
 const styles = StyleSheet.create({
   cont: {

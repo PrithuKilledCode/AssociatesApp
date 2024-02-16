@@ -1,8 +1,9 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {themeStyle} from '../themes/themeStyles';
 import theme from '../themes/theme';
 import Icon from 'react-native-vector-icons/AntDesign';
+import {useNavigation} from '@react-navigation/native';
 
 type Props = {
   text?: string;
@@ -10,8 +11,11 @@ type Props = {
 };
 
 const EventComponent = (props: Props) => {
+  const navigation = useNavigation();
   return (
-    <View style={themeStyle.greyBoxCase}>
+    <Pressable
+      style={themeStyle.greyBoxCase}
+      onPress={() => navigation.navigate('EventDetails' as never)}>
       <Text style={[themeStyle.poppinsTextBold, {color: theme.colors.text}]}>
         Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minima, eum?
       </Text>
@@ -31,7 +35,7 @@ const EventComponent = (props: Props) => {
           8.00 am - 9:00 am
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

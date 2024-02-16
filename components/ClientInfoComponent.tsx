@@ -1,14 +1,25 @@
-import {Dimensions, Image, StyleSheet, Text, View} from 'react-native';
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import React from 'react';
 import theme from '../themes/theme';
 import {themeStyle} from '../themes/themeStyles';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {useNavigation} from '@react-navigation/native';
 
 type Props = {};
 
 const ClientInfoComponent = (props: Props) => {
+  const navigation = useNavigation();
   return (
-    <View style={styles.container}>
+    <Pressable
+      style={styles.container}
+      onPress={() => navigation.navigate('ClientDetailsScreen' as never)}>
       <View>
         <Image
           style={styles.img}
@@ -34,7 +45,7 @@ const ClientInfoComponent = (props: Props) => {
           <Text style={themeStyle.textSmall}>123456789</Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

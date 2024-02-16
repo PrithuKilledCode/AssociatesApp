@@ -15,6 +15,10 @@ import DocumentsScreen from '../screens/DocumentsScreen';
 import TaskDetailsScreen from '../screens/TaskDetailsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ChatScreen from '../screens/ChatScreen';
+import ClientDetailsScreen from '../screens/ClientDetailsScreen';
+import AddTasksScreen from '../screens/AddTasksScreen';
+import AddEventScreen from '../screens/AddEventScreen';
+import EventDetailsScreen from '../screens/EventDetailsScreen';
 type Props = {};
 const Stack = createNativeStackNavigator();
 const TabNavigators = (props: Props) => {
@@ -35,6 +39,13 @@ const TabNavigators = (props: Props) => {
       <Stack.Screen name="TaskDetails" component={TaskDetailsScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Chats" component={ChatScreen} />
+      <Stack.Screen
+        name="ClientDetailsScreen"
+        component={ClientDetailsScreen}
+      />
+      <Stack.Screen name="Add Tasks" component={AddTasksScreen} />
+      <Stack.Screen name="Add Events" component={AddEventScreen} />
+      <Stack.Screen name="EventDetails" component={EventDetailsScreen} />
     </Stack.Navigator>
   );
 };

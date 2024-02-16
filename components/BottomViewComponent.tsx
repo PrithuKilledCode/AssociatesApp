@@ -8,10 +8,12 @@ import {
 import React from 'react';
 import {ButtonNormal} from '.';
 import theme from '../themes/theme';
+import {useNavigation} from '@react-navigation/native';
 
 type Props = {};
 
 const BottomViewComponent = (props: Props) => {
+  const navigation = useNavigation();
   return (
     <View
       style={{
@@ -34,18 +36,18 @@ const BottomViewComponent = (props: Props) => {
           width={241}
           backgroundColor={theme.colors.primary}
           radius={8}
-          buttonName="Add Task"
+          buttonName="Add Events"
           outlined
-          // onPress={() => setModal(true)}
+          onPress={() => navigation.navigate('Add Events' as never)}
         />
         <ButtonNormal
           height={52}
           width={241}
           backgroundColor={theme.colors.primary}
           radius={8}
-          buttonName="Add Event"
+          buttonName="Add Tasks"
           outlined
-          // onPress={() => setModal(true)}
+          onPress={() => navigation.navigate('Add Tasks' as never)}
         />
       </ImageBackground>
       <View style={styles.arrow}>

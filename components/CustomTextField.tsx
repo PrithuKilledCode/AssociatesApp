@@ -10,6 +10,11 @@ type Props = {
   onFocused?: any;
   show?: boolean;
   padding?: number;
+  height?: number;
+  background?: string;
+  margin?: number;
+  readonly?: boolean;
+  value?: string;
 };
 
 const CustomTextField = ({
@@ -20,15 +25,20 @@ const CustomTextField = ({
   onFocused,
   show,
   padding,
+  height,
+  background,
+  margin,
+  readonly,
+  value,
 }: Props) => {
   const styles = StyleSheet.create({
     container: {
       width: 339,
-      height: 52,
+      height: height ? height : 52,
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.colors.background,
-      margin: 10,
+      backgroundColor: background ? background : theme.colors.background,
+      margin: margin ? margin : 10,
       paddingHorizontal: padding ? padding : 20,
       paddingVertical: 5,
       alignSelf: 'center',
@@ -52,6 +62,8 @@ const CustomTextField = ({
         placeholder={placeholder}
         onFocus={() => (onFocused ? onFocused(true) : null)}
         onBlur={() => (onFocused ? onFocused(false) : null)}
+        readOnly={readonly}
+        value={value}
       />
       {right}
     </View>
