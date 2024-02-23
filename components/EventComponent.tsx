@@ -17,7 +17,7 @@ const EventComponent = (props: Props) => {
       style={themeStyle.greyBoxCase}
       onPress={() => navigation.navigate('EventDetails' as never)}>
       <Text style={[themeStyle.poppinsTextBold, {color: theme.colors.text}]}>
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minima, eum?
+        {props.text}
       </Text>
       <View
         style={{
@@ -32,7 +32,7 @@ const EventComponent = (props: Props) => {
             themeStyle.poppinsTextSmall,
             {color: theme.colors.textSecondry},
           ]}>
-          8.00 am - 9:00 am
+          {props.time}
         </Text>
       </View>
     </Pressable>

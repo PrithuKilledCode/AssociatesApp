@@ -43,7 +43,7 @@ const CustomModal = ({
               }
             />
           )}
-          <View style={{width: 300, marginVertical: 15}}>
+          <View style={{width: 300}}>
             <CustomLoginText
               text={msg}
               textAlign="center"
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 46,
-    padding: 40,
+    padding: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {

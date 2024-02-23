@@ -11,6 +11,7 @@ import theme from '../themes/theme';
 import {useNavigation} from '@react-navigation/native';
 
 type Props = {
+  id?: string;
   caseName: string;
   caseId: string;
   status?: 'active' | 'inactive';
@@ -22,7 +23,9 @@ const RecentCasesComponent = (props: Props) => {
   return (
     <Pressable
       style={themeStyle.greyBoxCase}
-      onPress={() => navigation.navigate('CaseDetails' as never)}>
+      onPress={() =>
+        navigation.navigate('CaseDetails' as never, {id: props.id} as never)
+      }>
       <Text
         style={[
           themeStyle.poppinsTextBold,
@@ -56,5 +59,3 @@ const RecentCasesComponent = (props: Props) => {
 };
 
 export default RecentCasesComponent;
-
-const styles = StyleSheet.create({});

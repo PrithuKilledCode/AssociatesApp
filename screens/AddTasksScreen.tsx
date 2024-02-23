@@ -78,6 +78,7 @@ const AddTasksScreen = (props: Props) => {
         />
 
         <CustomTextField
+          readonly
           placeholder="Add Client*"
           background={theme.colors.grey}
           onFocused={setShowClientDropdown}
@@ -126,6 +127,7 @@ const AddTasksScreen = (props: Props) => {
             )}></FlatList>
         ) : null}
         <CustomTextField
+          readonly
           placeholder="Add Cases*"
           background={theme.colors.grey}
           onFocused={setShowCasesDropdown}
@@ -157,7 +159,8 @@ const AddTasksScreen = (props: Props) => {
             renderItem={cases => (
               <Pressable
                 onPress={() => {
-                  setCases(prev => cases.item.description);
+                  setCases(cases.item.description);
+                  setShowCasesDropdown(false);
                 }}
                 key={cases.index}
                 style={{

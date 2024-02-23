@@ -1,5 +1,5 @@
 import {Dimensions, Pressable, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useCallback} from 'react';
 import theme from '../themes/theme';
 import {themeStyle} from '../themes/themeStyles';
 
@@ -58,7 +58,11 @@ const EventSwitchComponent = ({calender, setCalender}: Props) => {
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.calender} onPress={() => setCalender(!calender)}>
+      <Pressable
+        style={styles.calender}
+        onPress={useCallback(() => {
+          setCalender(!calender);
+        }, [calender])}>
         <Text
           style={[
             themeStyle.poppinsTextBold,
@@ -67,7 +71,11 @@ const EventSwitchComponent = ({calender, setCalender}: Props) => {
           Calenders
         </Text>
       </Pressable>
-      <Pressable style={styles.event} onPress={() => setCalender(!calender)}>
+      <Pressable
+        style={styles.event}
+        onPress={useCallback(() => {
+          setCalender(!calender);
+        }, [calender])}>
         <Text
           style={[
             themeStyle.poppinsTextBold,

@@ -6,47 +6,53 @@ import {
   View,
   FlatList,
   SafeAreaView,
+  Animated,
+  Dimensions,
 } from 'react-native';
-import React from 'react';
+import React, {Suspense, useEffect, useState} from 'react';
 
 import {HeaderComponent} from '../components';
 import Icon from 'react-native-vector-icons/AntDesign';
 import theme from '../themes/theme';
 import {useNavigation} from '@react-navigation/native';
 import RecentCasesComponent from '../components/RecentCasesComponent';
+import {useAppDispatch, useAppSelector} from '../hooks';
+import {getCases} from '../Redux/slices/getCasesSlice';
+import NotFoundComponent from '../components/NotFoundComponent';
+import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
+import {themeStyle} from '../themes/themeStyles';
 
-type Props = {};
 type ItemData = {
   id: number;
   caseId: string;
   description: string;
 };
-const recentCases: ItemData[] = [
-  {
-    id: 11,
-    caseId: '0001',
-    description: 'Breach of Contract - Client A vs.Company B',
-  },
-  {
-    id: 31,
-    caseId: '0003',
-    description: 'Property Dispute - Smith Estate',
-  },
-  {
-    id: 41,
-    caseId: '0004',
-    description: 'Criminal Case - State vs. Doe',
-  },
-  {
-    id: 51,
-    caseId: '0005',
-    description: 'Divorce Settlement - Johnson vs. Johnson',
-  },
-];
 
-const CasesScreen = (props: Props) => {
+const CasesScreen = () => {
+  const dispatch = useAppDispatch();
+  let caseArr;
+  const user = useAppSelector(state => state.root.getUser.user);
+
+  const [flag, setFlag] = useState<boolean>(true);
+
+  useEffect(() => {
+    console.log('hello');
+    dispatch(
+      getCases({
+        requesterRole: user?.user.role,
+        requesterId: user?.user._id,
+        token: user?.token,
+      }),
+    );
+  }, []);
+  const cases = useAppSelector(state => state.root.getCases.cases);
+  const isLoading = useAppSelector(state => state.root.getCases.isLoading);
+  caseArr = cases?.cases ?? [];
+  if (caseArr?.length === 0) {
+    setFlag(false);
+  }
   const navigation = useNavigation();
-  const flag = false;
+
   return (
     <SafeAreaView
       style={{
@@ -70,32 +76,45 @@ const CasesScreen = (props: Props) => {
         }
       />
       <View style={{height: 90}}></View>
-      {flag ? (
-        <FlatList
-          data={recentCases}
-          keyExtractor={item => item.id.toString()}
-          renderItem={cases => (
-            <RecentCasesComponent
-              key={cases.index}
-              caseId={cases.item.caseId}
-              caseName={cases.item.description}
-            />
-          )}></FlatList>
+
+      {!isLoading ? (
+        <>
+          {flag ? (
+            <FlatList
+              data={caseArr}
+              keyExtractor={item => item._id.toString()}
+              renderItem={cases => (
+                <RecentCasesComponent
+                  id={cases.item._id}
+                  key={cases.index}
+                  caseId={cases.item.caseName}
+                  caseName={cases.item.caseSummary}
+                />
+              )}></FlatList>
+          ) : (
+            <NotFoundComponent />
+          )}
+        </>
       ) : (
-        <View>
-          <View style={{height: 60}}></View>
-          <Image
-            source={require('../images/notFound.png')}
-            style={styles.img}
-            resizeMode="contain"
+        <>
+          <ShimmerPlaceholder
+            height={100}
+            width={Dimensions.get('screen').width - 60}
+            style={styles.shimmer}
           />
-          <Text style={styles.text}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam
-            quis ipsam enim nihil quasi nulla nobis accusamus accusantium
-            aliquam sint a aspernatur eius commodi recusandae repudiandae eaque,
-            provident non minima!
-          </Text>
-        </View>
+          <ShimmerPlaceholder
+            height={100}
+            width={Dimensions.get('screen').width - 60}
+            style={styles.shimmer}
+          />
+          <ShimmerPlaceholder
+            height={100}
+            width={Dimensions.get('screen').width - 60}
+            style={styles.shimmer}
+          />
+
+          {/* <ShimmerPlaceholder  style={[themeStyle.greyBoxCase, {height: 50}]} /> */}
+        </>
       )}
     </SafeAreaView>
   );
@@ -104,15 +123,9 @@ const CasesScreen = (props: Props) => {
 export default CasesScreen;
 
 const styles = StyleSheet.create({
-  text: {
-    textAlign: 'center',
-    width: 200,
+  shimmer: {
     alignSelf: 'center',
-    marginVertical: 20,
-  },
-  img: {
-    height: 129,
-    width: 122,
-    alignSelf: 'center',
+    borderRadius: 8,
+    margin: 4,
   },
 });

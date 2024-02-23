@@ -1,6 +1,8 @@
 import {
+  Alert,
   Dimensions,
   ImageBackground,
+  Modal,
   StyleSheet,
   Text,
   View,
@@ -15,18 +17,7 @@ type Props = {};
 const BottomViewComponent = (props: Props) => {
   const navigation = useNavigation();
   return (
-    <View
-      style={{
-        height: 220,
-        top: -245,
-        position: 'absolute',
-        alignSelf: 'center',
-        width: Dimensions.get('screen').width - 40,
-        alignItems: 'center',
-        alignContent: 'center',
-        justifyContent: 'center',
-        marginHorizontal: 20,
-      }}>
+    <View style={styles.views}>
       <ImageBackground
         imageStyle={{borderRadius: 10}}
         style={styles.container}
@@ -77,5 +68,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     bottom: 0,
     transform: [{rotate: '45deg'}],
+  },
+  views: {
+    height: 220,
+    top: -245,
+    position: 'absolute',
+    alignSelf: 'center',
+    width: Dimensions.get('screen').width - 40,
+    alignItems: 'center',
+    alignContent: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 20,
   },
 });

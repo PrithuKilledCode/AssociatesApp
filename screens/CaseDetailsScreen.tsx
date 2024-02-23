@@ -1,17 +1,39 @@
 import {Pressable, SafeAreaView, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import theme from '../themes/theme';
 import RecentCasesComponent from '../components/RecentCasesComponent';
 import {HeaderComponent} from '../components';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {themeStyle} from '../themes/themeStyles';
 import ShowDetailsComponent from '../components/showDetailsComponent';
+import {useAppSelector} from '../hooks';
 
-type Props = {};
+type Case = {
+  __v: number;
+  _id: string;
+  adminId: string;
+  caseName: string;
+  caseSummary: string;
+  courtCaseId: string;
+  createdAt: string; // This should ideally be a Date type if possible
+  lawFirmId: string;
+  status: boolean;
+  totalAssociate: number;
+};
 
-const CaseDetailsScreen = (props: Props) => {
+const CaseDetailsScreen = () => {
   const navigation = useNavigation();
+  const cases = useAppSelector(state => state.root.getCases.cases);
+  const routes = useRoute();
+  const id = routes?.params?.id;
+
+  const caseArr = cases?.cases;
+  let caseInfo: any = caseArr?.filter(c => {
+    return c._id === id;
+  });
+  console.log(caseInfo, 'this is caseInfo');
+
   return (
     <SafeAreaView
       style={{
@@ -28,19 +50,13 @@ const CaseDetailsScreen = (props: Props) => {
       />
       <View style={{height: 90}}></View>
       <RecentCasesComponent
-        status="active"
-        caseId="0005"
-        caseName="Jhonson Vs JhonSon"
+        status={caseInfo?.[0]?.status ? 'active' : 'inactive'}
+        caseId={caseInfo?.[0]?.courtCaseId}
+        caseName={caseInfo?.[0]?.caseName}
       />
       <View style={{padding: 30}}>
         <Text style={themeStyle.poppinsTextSmall}>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Velit id
-          debitis neque soluta voluptatum consequuntur dolores sunt cum illum
-          praesentium error deserunt, animi at possimus impedit iste repudiandae
-          aspernatur. Saepe! Lorem ipsum dolor sit amet consectetur, adipisicing
-          elit.{'\n'} {'\n'}Voluptate aspernatur eveniet unde asperiores ipsam
-          ex totam, laudantium iusto, possimus perferendis, in exercitationem.
-          Odio voluptatem officia voluptatibus ullam aspernatur vitae quia!
+          {caseInfo?.[0]?.caseSummary}
         </Text>
       </View>
       <View style={styles.pressableCont}>
@@ -64,7 +80,7 @@ const CaseDetailsScreen = (props: Props) => {
         <ShowDetailsComponent
           image={require('../images/associates.png')}
           text="Associates"
-          count={10}
+          count={caseInfo?.[0]?.totalAssociate}
         />
       </View>
     </SafeAreaView>

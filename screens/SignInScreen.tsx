@@ -12,12 +12,19 @@ import theme from '../themes/theme';
 import RadioButton from '../components/radioButton';
 import {themeStyle} from '../themes/themeStyles';
 import {useNavigation} from '@react-navigation/native';
-
+import {useDispatch, useSelector} from 'react-redux';
+import {getUser} from '../Redux/slices/getUserSlice';
 type Props = {};
 
 const SignInScreen = (props: Props) => {
   const navigation = useNavigation();
   const [selected, setSelected] = useState<boolean>(false);
+  const [eye, setEye] = useState<boolean>(false);
+
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const dispatch = useDispatch();
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <Background>
@@ -27,11 +34,26 @@ const SignInScreen = (props: Props) => {
         <CustomTextField
           left={<Icon name="mobile" size={18} color={theme.colors.icon}></Icon>}
           placeholder="Enter your Email"
+          value={email}
+          setValue={setEmail}
         />
         <CustomTextField
           left={<Icon name="lock" size={18} color={theme.colors.icon}></Icon>}
           placeholder="Enter Your Password"
-          right={<Icon name="eye" size={18} color={theme.colors.icon}></Icon>}
+          right={
+            <Pressable
+              onPress={() => {
+                setEye(!eye);
+              }}>
+              <Icon
+                name={eye ? 'eye-slash' : 'eye'}
+                size={18}
+                color={theme.colors.icon}></Icon>
+            </Pressable>
+          }
+          setValue={setPassword}
+          value={password}
+          password={!eye}
         />
         <View style={styles.btnContainer}>
           <Pressable
@@ -64,6 +86,11 @@ const SignInScreen = (props: Props) => {
           backgroundColor={theme.colors.secondary}
           buttonName="Sign in"
           radius={8}
+          onPress={() =>
+            dispatch(
+              getUser({email: email, password: password, role: 'associate'}),
+            )
+          }
         />
       </Background>
     </SafeAreaView>

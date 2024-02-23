@@ -13,6 +13,7 @@ import {themeStyle} from '../themes/themeStyles';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {CustomModal} from '.';
 
+
 type Props = {
   time: string;
   text: string;

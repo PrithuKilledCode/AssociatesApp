@@ -1,20 +1,18 @@
-import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
 
-import Tabs from './navigatorsFolder/CustomTabComponent';
-import TabNavigators from './navigatorsFolder/Tabnavigator';
+import {Provider} from 'react-redux';
+import {persistor, store} from './store';
+import {PersistGate} from 'redux-persist/integration/react';
+import NavigatorCont from './navigatorsFolder/navigatorCont';
 
-type Props = {};
-
-const App = (props: Props) => {
+const App = () => {
   return (
-    <NavigationContainer>
-      <TabNavigators />
-    </NavigationContainer>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <NavigatorCont />
+      </PersistGate>
+    </Provider>
   );
 };
 
 export default App;
-
-const styles = StyleSheet.create({});

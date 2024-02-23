@@ -5,22 +5,54 @@ import {
   Text,
   View,
   ScrollView,
+  FlatList,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import theme from '../themes/theme';
 import {HeaderComponent} from '../components';
 import Icon from 'react-native-vector-icons/AntDesign';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {Calendar} from 'react-native-calendars';
 import EventSwitchComponent from '../components/EventSwitchComponent';
 import EventComponent from '../components/EventComponent';
+import {useAppDispatch, useAppSelector} from '../hooks';
+import {getEvents} from '../Redux/slices/getEventSlice';
+import NotFoundComponent from '../components/NotFoundComponent';
 
 type Props = {};
 
 const EventScreen = (props: Props) => {
   const [showCalender, setShowCalender] = useState<boolean>(false);
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
   const [selected, setSelected] = useState('');
+  const [refreshing, setRefreshing] = React.useState(false);
+  const user = useAppSelector(state => state.root.getUser.user);
+  const events = useAppSelector(state => state.root.getEvents.events);
+  useEffect(() => {
+    dispatch(
+      getEvents({
+        role: user?.user.role,
+        userId: user?.user._id,
+        token: user?.token,
+      }),
+    );
+  }, [refreshing, setRefreshing]);
+
+  const eventsArr = events?.eventList;
+
+  const [flag, setFlag] = useState<boolean>(true);
+  if (eventsArr?.length === 0) {
+    setFlag(false);
+  }
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, [refreshing, setRefreshing]);
+
   return (
     <SafeAreaView
       style={{
@@ -43,38 +75,48 @@ const EventScreen = (props: Props) => {
         }
       />
       <View style={{height: 90}}></View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <EventSwitchComponent
-          calender={showCalender}
-          setCalender={setShowCalender}
+      {flag ? (
+        <FlatList
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          data={eventsArr}
+          ListHeaderComponent={
+            <>
+              <EventSwitchComponent
+                calender={showCalender}
+                setCalender={setShowCalender}
+              />
+              {showCalender ? (
+                <Calendar
+                  onDayPress={day => {
+                    setSelected(day.dateString);
+                  }}
+                  style={{marginHorizontal: 20, marginVertical: 20}}
+                  markedDates={{
+                    [selected]: {
+                      selected: true,
+                      disableTouchEvent: true,
+                    },
+                  }}
+                />
+              ) : null}
+            </>
+          }
+          keyExtractor={item => item._id.toString()}
+          renderItem={tasks => (
+            <EventComponent
+              text={tasks.item.eventName}
+              time={tasks.item.date}
+            />
+          )}
         />
-        {showCalender ? (
-          <Calendar
-            onDayPress={day => {
-              setSelected(day.dateString);
-            }}
-            style={{marginHorizontal: 20, marginVertical: 20}}
-            markedDates={{
-              [selected]: {
-                selected: true,
-                disableTouchEvent: true,
-              },
-            }}
-          />
-        ) : null}
-        <EventComponent />
-        <EventComponent />
-        <EventComponent />
-        <EventComponent />
-        <EventComponent />
-        <EventComponent />
-        <EventComponent />
-        <EventComponent />
-      </ScrollView>
+      ) : (
+        <NotFoundComponent />
+      )}
     </SafeAreaView>
   );
 };
 
 export default EventScreen;
 
-const styles = StyleSheet.create({});
+

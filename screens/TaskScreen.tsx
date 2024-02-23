@@ -1,54 +1,57 @@
 import {
+  Dimensions,
+  FlatList,
+  Image,
   Pressable,
+  RefreshControl,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import React from 'react';
-import CustomTabComponent from '../navigatorsFolder/CustomTabComponent';
+import React, {useEffect, useState} from 'react';
 import theme from '../themes/theme';
 import {HeaderComponent} from '../components';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import TaskComponent from '../components/TaskComponent';
+import {useAppDispatch, useAppSelector} from '../hooks';
+import {getTasks} from '../Redux/slices/getTasksSlice';
+import NotFoundComponent from '../components/NotFoundComponent';
+import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
 
-type Props = {};
-const Tasks = [
-  {
-    id: 11,
-    heading: 'This is the heading of the task',
-    date: '4 march',
-    description:
-      'Lorem ipsum dolor, sit amet consectetur adipisicing elit.Facere laborum impedit porro debitis aut sunt obcaecati eius ut ad, sed saepe non nemo placeat nulla voluptatum magni fugiat! Molestias, maiores.',
-  },
-  {
-    id: 12,
-    heading: 'This is the heading of the task',
-    date: '4 march',
-    description:
-      'Lorem ipsum dolor, sit amet consectetur adipisicing elit.Facere laborum impedit porro debitis aut sunt obcaecati eius ut ad, sed saepe non nemo placeat nulla voluptatum magni fugiat! Molestias, maiores.',
-  },
-  {
-    id: 13,
-    heading: 'This is the heading of the task',
-    date: '4 march',
-    description:
-      'Lorem ipsum dolor, sit amet consectetur adipisicing elit.Facere laborum impedit porro debitis aut sunt obcaecati eius ut ad, sed saepe non nemo placeat nulla voluptatum magni fugiat! Molestias, maiores.',
-  },
-  {
-    id: 14,
-    heading: 'This is the heading of the task',
-    date: '4 march',
-    description:
-      'Lorem ipsum dolor, sit amet consectetur adipisicing elit.Facere laborum impedit porro debitis aut sunt obcaecati eius ut ad, sed saepe non nemo placeat nulla voluptatum magni fugiat! Molestias, maiores.',
-  },
-];
-
-const TaskScreen = (props: Props) => {
+const TaskScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
+  const [refreshing, setRefreshing] = React.useState(false);
+  const user = useAppSelector(state => state.root.getUser.user);
+  let rendercount = 2;
 
+  useEffect(() => {
+    rendercount++;
+    console.log(rendercount);
+    dispatch(
+      getTasks({
+        role: user?.user.role,
+        userId: user?.user._id,
+        token: user?.token,
+      }),
+    );
+    return () => {
+      setRefreshing(false);
+    };
+  }, [refreshing]);
+  const tasks = useAppSelector(state => state.root.getTasks.tasks);
+  const isLoading = useAppSelector(state => state.root.getTasks.isLoading);
+  const tasksArr = tasks?.taskList ?? [];
+  const [flag, setFlag] = useState<boolean>(true);
+  if (tasksArr?.length === 0) {
+    setFlag(false);
+  }
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+  }, [setRefreshing]);
   return (
     <SafeAreaView
       style={{
@@ -63,22 +66,75 @@ const TaskScreen = (props: Props) => {
           </Pressable>
         }
       />
-      <View style={{height: 90}}></View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {Tasks.map(task => (
-          <TaskComponent
-            title={task.heading}
-            key={task.id}
-            description={task.description}
-            date={task.date}
-            grey
-          />
-        ))}
-      </ScrollView>
+      <View style={{height: 90}} />
+      {!isLoading ? (
+        <>
+          {flag ? (
+            <FlatList
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              showsVerticalScrollIndicator={false}
+              data={tasksArr}
+              keyExtractor={item => item._id.toString()}
+              renderItem={tasks => (
+                <TaskComponent
+                  title={tasks.item.taskName}
+                  key={tasks.item._id}
+                  description={tasks.item.taskDescription}
+                  date={tasks.item.createdAt}
+                  grey
+                />
+              )}
+            />
+          ) : (
+            <NotFoundComponent />
+          )}
+        </>
+      ) : (
+        <>
+          <>
+            <ShimmerPlaceholder
+              height={100}
+              width={Dimensions.get('screen').width - 60}
+              style={styles.shimmer}
+            />
+            <ShimmerPlaceholder
+              height={100}
+              width={Dimensions.get('screen').width - 60}
+              style={styles.shimmer}
+            />
+            <ShimmerPlaceholder
+              height={100}
+              width={Dimensions.get('screen').width - 60}
+              style={styles.shimmer}
+            />
+
+            {/* <ShimmerPlaceholder  style={[themeStyle.greyBoxCase, {height: 50}]} /> */}
+          </>
+        </>
+      )}
     </SafeAreaView>
   );
 };
 
 export default TaskScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  text: {
+    textAlign: 'center',
+    width: 200,
+    alignSelf: 'center',
+    marginVertical: 20,
+  },
+  img: {
+    height: 129,
+    width: 122,
+    alignSelf: 'center',
+  },
+  shimmer: {
+    alignSelf: 'center',
+    borderRadius: 8,
+    margin: 4,
+  },
+});

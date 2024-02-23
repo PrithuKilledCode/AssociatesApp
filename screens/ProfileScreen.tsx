@@ -16,13 +16,36 @@ import {useNavigation} from '@react-navigation/native';
 import {themeStyle} from '../themes/themeStyles';
 import ProfileComponent from '../components/ProfileComponent';
 
+import {
+  ImageLibraryOptions,
+  MediaType,
+  launchCamera,
+  launchImageLibrary,
+} from 'react-native-image-picker';
+import {assets} from '../react-native.config';
+import {useAppSelector} from '../hooks';
+
 type Props = {};
 
 const ProfileScreen = (props: Props) => {
+  const [image, setImage] = useState<string | undefined>('');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
+  const user = useAppSelector(state => state.root.getUser.user);
 
   const navigation = useNavigation();
+  async function getImage() {
+    let options = {
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+      mediaType: 'photo' as MediaType,
+    };
+    const result: any = await launchImageLibrary(options);
+    setImage(result?.assets[0]?.uri as 'string');
+    console.log(result);
+  }
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background}}>
       <HeaderComponent
@@ -43,10 +66,14 @@ const ProfileScreen = (props: Props) => {
             <Image
               style={styles.img}
               source={{
-                uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpqLeBS5eShlsAhfmp3mFHmT6BmxqRR3Nc2OQrlxd3wZAYDVbPyZ4X-JbGf4GZbjTJJr0&usqp=CAU',
+                uri: image ? image : user?.user.profileUrl,
               }}
             />
-            <Pressable style={styles.editContainer}>
+            <Pressable
+              style={styles.editContainer}
+              onPress={() => {
+                getImage();
+              }}>
               <Image
                 source={require('../images/edit.png')}
                 resizeMode="contain"
@@ -63,11 +90,19 @@ const ProfileScreen = (props: Props) => {
                   fontWeight: '600',
                 },
               ]}>
-              Harvey Spectre
+              {user?.user.firstName + ' ' + user?.user.lastName}
             </Text>
             <Text
-              style={[themeStyle.textSmall, {color: theme.colors.background}]}>
-              harvey@example.com
+              style={[
+                themeStyle.textSmall,
+                {
+                  color: theme.colors.background,
+                  textAlign: 'center',
+                  width: 300,
+                  marginLeft: 10,
+                },
+              ]}>
+              {user?.user.email}
             </Text>
           </View>
         </ImageBackground>

@@ -1,9 +1,7 @@
 import {
-  Dimensions,
   Image,
   Pressable,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -184,6 +182,7 @@ const ClientDetailsScreen = (props: Props) => {
           </>
         }
         nestedScrollEnabled
+        showsVerticalScrollIndicator={false}
         data={recentCases}
         keyExtractor={item => item.id.toString()}
         renderItem={cases => (

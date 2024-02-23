@@ -15,6 +15,9 @@ type Props = {
   margin?: number;
   readonly?: boolean;
   value?: string;
+  setValue?: any;
+  multiline?: boolean;
+  password?: boolean;
 };
 
 const CustomTextField = ({
@@ -30,6 +33,9 @@ const CustomTextField = ({
   margin,
   readonly,
   value,
+  setValue,
+  multiline,
+  password,
 }: Props) => {
   const styles = StyleSheet.create({
     container: {
@@ -56,7 +62,7 @@ const CustomTextField = ({
       ]}>
       {left}
       <TextInput
-        multiline={true}
+        multiline={multiline}
         scrollEnabled
         style={{width: right ? '80%' : '90%'}}
         placeholder={placeholder}
@@ -64,6 +70,8 @@ const CustomTextField = ({
         onBlur={() => (onFocused ? onFocused(false) : null)}
         readOnly={readonly}
         value={value}
+        onChangeText={text => setValue(text)}
+        secureTextEntry={password}
       />
       {right}
     </View>

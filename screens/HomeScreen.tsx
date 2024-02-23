@@ -6,8 +6,9 @@ import {
   ScrollView,
   Pressable,
   BackHandler,
+  FlatList,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {Suspense, useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import HeaderComponent from '../components/HeaderComponent';
 import theme from '../themes/theme';
@@ -20,6 +21,11 @@ import TaskComponent from '../components/TaskComponent';
 import {useNavigation} from '@react-navigation/native';
 import SearchComponent from '../components/SearchComponent';
 import {themeStyle} from '../themes/themeStyles';
+import {useAppDispatch, useAppSelector} from '../hooks';
+import {getCases} from '../Redux/slices/getCasesSlice';
+import {getTasks} from '../Redux/slices/getTasksSlice';
+import {RefreshControl} from 'react-native-gesture-handler';
+import ShimmerPlaceholder from 'react-native-shimmer-placeholder';
 
 type Props = {};
 const clients = [
@@ -109,16 +115,53 @@ const Tasks = [
 
 console.log(recentCases);
 
-const HomeScreen = (props: Props) => {
+const HomeScreen = () => {
+  const [refreshing, setRefreshing] = React.useState(false);
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.root.getUser.user);
+
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', () => {
       setShowSearch(false);
       return true;
     });
   }, []);
+  useEffect(() => {
+    console.log('hello');
+    dispatch(
+      getCases({
+        requesterRole: user?.user.role,
+        requesterId: user?.user._id,
+        token: user?.token,
+        limit: 10,
+      }),
+    );
+  }, [refreshing, setRefreshing]);
+  useEffect(() => {
+    console.log('hello');
+    dispatch(
+      getTasks({
+        role: user?.user.role,
+        userId: user?.user._id,
+        token: user?.token,
+        limit: 10,
+      }),
+    );
+  }, [refreshing, setRefreshing]);
+  const tasks = useAppSelector(state => state.root.getTasks.tasks);
+  const tasksArr = tasks?.taskList ?? [];
+
+  const cases = useAppSelector(state => state.root.getCases.cases);
+  const caseArr = cases?.cases;
 
   const navigation = useNavigation();
   const [showSearch, setShowSearch] = useState<boolean>(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background}}>
       <HeaderComponent
@@ -146,90 +189,126 @@ const HomeScreen = (props: Props) => {
         }
       />
       <View style={{height: 90}}></View>
-      <ScrollView>
-        <CustomTextField
-          left={
-            <View>
-              <Icon name="search" size={18} color={theme.colors.text}></Icon>
-            </View>
-          }
-          placeholder="search"
-          border
-          show={showSearch}
-          onFocused={setShowSearch}
-        />
 
-        <ScrollViewHeaderComponent
-          leftText="Clients"
-          right
-          onPress={() => navigation.navigate('Client' as never)}
-        />
-        <HorizontalScrollViewComponent height={180}>
-          {clients.map(client => (
-            <ClientComponent
-              key={client.id}
-              uri={client.image}
-              name={client.name}
+      <FlatList
+        ListHeaderComponent={
+          <>
+            <CustomTextField
+              left={
+                <View>
+                  <Icon
+                    name="search"
+                    size={18}
+                    color={theme.colors.text}></Icon>
+                </View>
+              }
+              placeholder="search"
+              border
+              show={showSearch}
+              onFocused={setShowSearch}
             />
-          ))}
-        </HorizontalScrollViewComponent>
-        <ScrollViewHeaderComponent leftText="Recent Events" />
-        <HorizontalScrollViewComponent height={180}>
-          {recentEvents.map(event => (
-            <RecentEventComponent
-              text={event.event}
-              date={event.date}
-              key={event.id}
+
+            <ScrollViewHeaderComponent
+              leftText="Clients"
+              right
+              onPress={() => navigation.navigate('Client' as never)}
             />
-          ))}
-        </HorizontalScrollViewComponent>
-        <ScrollViewHeaderComponent
-          leftText="Recent Cases"
-          right
-          onPress={() => navigation.navigate('Cases' as never)}
-        />
-        <ScrollView>
-          {recentCases.map(cases => (
+            <HorizontalScrollViewComponent height={180}>
+              {clients.map(client => (
+                <ClientComponent
+                  key={client.id}
+                  uri={client.image}
+                  name={client.name}
+                />
+              ))}
+            </HorizontalScrollViewComponent>
+            <ScrollViewHeaderComponent leftText="Recent Events" />
+            <HorizontalScrollViewComponent height={180}>
+              {recentEvents.map(event => (
+                <RecentEventComponent
+                  text={event.event}
+                  date={event.date}
+                  key={event.id}
+                />
+              ))}
+            </HorizontalScrollViewComponent>
+            <ScrollViewHeaderComponent
+              leftText="Recent Cases"
+              right
+              onPress={() => navigation.navigate('Cases' as never)}
+            />
+          </>
+        }
+        ListFooterComponent={
+          <>
+            <ScrollViewHeaderComponent leftText="Recent Tasks" />
+            <FlatList
+              // refreshControl={
+              //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              // }
+              showsVerticalScrollIndicator={false}
+              data={tasksArr}
+              keyExtractor={item => item._id.toString()}
+              renderItem={tasks => (
+                <Suspense
+                  fallback={
+                    <ShimmerPlaceholder
+                      style={[themeStyle.greyBoxCase, {height: 40}]}
+                    />
+                  }>
+                  <TaskComponent
+                    title={tasks.item.taskName}
+                    key={tasks.item._id}
+                    description={tasks.item.taskDescription}
+                    date={tasks.item.createdAt}
+                  />
+                </Suspense>
+              )}
+            />
+          </>
+        }
+        showsVerticalScrollIndicator={false}
+        data={caseArr}
+        keyExtractor={item => item._id.toString()}
+        renderItem={cases => (
+          <RecentCasesComponent
+            id={cases.item._id}
+            key={cases.item._id}
+            caseId={cases.item.courtCaseId}
+            caseName={cases.item.caseName}
+          />
+        )}></FlatList>
+      {/* <ScrollView>
+          {caseArr.map(cases => (
             <RecentCasesComponent
-              key={cases.id}
-              caseId={cases.caseId}
-              caseName={cases.description}
+              key={cases._id}
+              caseId={cases.caseName}
+              caseName={cases.caseSummary}
             />
           ))}
-        </ScrollView>
-        <ScrollViewHeaderComponent leftText="Recent Tasks" />
-        <ScrollView>
-          {Tasks.map(task => (
-            <TaskComponent
-              title={task.heading}
-              key={task.id}
-              description={task.description}
-              date={task.date}
-            />
-          ))}
-        </ScrollView>
-        {showSearch ? (
-          <View style={styles.searchList}>
-            <View style={{height: 50}}></View>
-            <SearchComponent image="blah" name="Harvey Spectre" />
-            <SearchComponent image="blah" name="Harvey Spectre" />
-            <SearchComponent image="blah" name="Harvey Spectre" />
-            <SearchComponent image="blah" name="Harvey Spectre" />
-            <Pressable
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                alignSelf: 'center',
-                margin: 10,
-              }}>
-              <Text
-                style={[themeStyle.textMedium, {color: theme.colors.primary}]}>
-                View All
-              </Text>
-            </Pressable>
-          </View>
-        ) : null}
-      </ScrollView>
+        </ScrollView> */}
+
+      {showSearch ? (
+        <View style={styles.searchList}>
+          <View style={{height: 50}}></View>
+          <SearchComponent image="blah" name="Harvey Spectre" />
+          <SearchComponent image="blah" name="Harvey Spectre" />
+          <SearchComponent image="blah" name="Harvey Spectre" />
+          <SearchComponent image="blah" name="Harvey Spectre" />
+          <Pressable
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignSelf: 'center',
+              margin: 10,
+            }}>
+            <Text
+              style={[themeStyle.textMedium, {color: theme.colors.primary}]}>
+              View All
+            </Text>
+          </Pressable>
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 };

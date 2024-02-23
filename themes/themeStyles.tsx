@@ -9,6 +9,7 @@ export const themeStyle = StyleSheet.create({
     lineHeight: 17,
     letterSpacing: 0,
     textAlign: 'left',
+    color: 'grey',
   },
   textMedium: {
     fontFamily: theme.fonts.uber,
@@ -16,6 +17,7 @@ export const themeStyle = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 21.05,
     letterSpacing: 0,
+    color: 'grey',
     textAlign: 'left',
   },
   poppinsTextMedium: {
@@ -24,6 +26,7 @@ export const themeStyle = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 30,
     letterSpacing: 0,
+    color: 'grey',
     textAlign: 'left',
   },
   poppinsTextBold: {
@@ -33,6 +36,7 @@ export const themeStyle = StyleSheet.create({
     lineHeight: 21,
     letterSpacing: 0,
     textAlign: 'left',
+    color: 'grey',
   },
   poppinsTextSmall: {
     fontFamily: 'Poppins',
@@ -40,6 +44,7 @@ export const themeStyle = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 18,
     letterSpacing: 0,
+    color: 'grey',
     textAlign: 'left',
   },
   greyBoxCase: {
